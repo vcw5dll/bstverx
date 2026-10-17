@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>bstverx — личная страница начинающего дизайнера</title>
+<meta name="description" content="bstverx — начинающий дизайнер, пробующий себя в разных сферах и осваивающий создание сайтов.">
+<meta property="og:title" content="bstverx">
+<meta property="og:description" content="Начинающий дизайнер, пробующий себя в разных сферах.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#05060f">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+<style>
+/* 1. ЦВЕТА. Меняй их здесь — сайт перекрасится целиком. */
+:root {
+  --bg: #05060f;
+  --text: #eef0ff;
+  --muted: #a3a8cc;
+  --accent: #8ea2ff;
+  --card: rgba(18, 22, 48, 0.55);
+  --line: rgba(160, 170, 255, 0.22);
+  color-scheme: dark;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+/* Сайт сразу тёмный, космический: тема одна, без переключения */
+* { box-sizing: border-box; }
+body {
+  margin: 0; color: var(--text);
+  /* Фон-космос: два цветных «туманных» пятна поверх почти чёрного цвета */
+  background:
+    radial-gradient(ellipse at 20% 10%, #1a1446 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 90%, #0b2a4a 0%, transparent 50%),
+    var(--bg);
+  background-attachment: fixed;
+  font-family: Georgia, "Times New Roman", serif; line-height: 1.6;
+}
+/* 2. РАСКЛАДКА. max-width не даёт тексту растягиваться на широких экранах. */
+/* Холст с точками лежит на заднем плане, контент — поверх него */
+#space { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+main { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 48px 20px 64px; }
+h1 { font-size: clamp(2rem, 7vw, 3rem); line-height: 1.15; margin: 0 0 12px; }
+h2 { font-size: 1.3rem; margin: 48px 0 16px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.lead { font-size: 1.15rem; color: var(--muted); margin: 0 0 24px; }
+.tag { color: var(--accent); font-family: system-ui, sans-serif; font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; }
+.btn {
+  display: inline-block; padding: 10px 20px; border-radius: 999px;
+  background: var(--accent); color: #0a0c1f; text-decoration: none;
+  font-family: system-ui, sans-serif; font-weight: 600;
+}
+/* Выпадающий список «Связаться»: меню скрыто и показывается при наведении (:hover)
+   или когда кнопка в фокусе (:focus-within) — так работает и на телефоне по нажатию */
+.dropdown { position: relative; display: inline-block; }
+button.btn { border: 0; cursor: pointer; font-size: 1rem; }
+/* Меню открывается ВПРАВО от кнопки (left: 100%), где свободное место,
+   и позиционируется абсолютно — поэтому ничего на странице не сдвигает и не перекрывает. */
+.menu {
+  position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+  padding-left: 12px; display: flex; gap: 10px; z-index: 5;
+  visibility: hidden; transition: visibility 0s linear .45s; /* скрываем после анимации ухода */
+}
+.dropdown:hover .menu, .dropdown:focus-within .menu { visibility: visible; transition-delay: 0s; }
+
+/* Иконки: в закрытом состоянии мелкие, прозрачные и повёрнутые. При открытии «выпрыгивают»
+   с пружинящим эффектом (cubic-bezier) по очереди; при закрытии прячутся в обратном порядке. */
+.menu a {
+  width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+  opacity: 0; transform: translateX(-18px) scale(.4) rotate(-40deg);
+  transition: transform .45s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease, box-shadow .2s;
+  transition-delay: calc((1 - var(--i)) * 70ms);
+}
+.menu a svg { width: 24px; height: 24px; display: block; }
+.menu a.tg { background: #229ED9; } /* цвет Telegram */
+.menu a.gm { background: #EA4335; } /* цвет Gmail */
+.dropdown:hover .menu a, .dropdown:focus-within .menu a {
+  opacity: 1; transform: none; transition-delay: calc(var(--i) * 70ms);
+}
+.dropdown .menu a:hover { transform: translateY(-3px) scale(1.12); box-shadow: 0 10px 22px rgba(0, 0, 0, .55); transition-delay: 0s; }
+.arrow { display: inline-block; transition: transform .3s ease; }
+.dropdown:hover .arrow, .dropdown:focus-within .arrow { transform: translateX(4px); }
+@media (prefers-reduced-motion: reduce) { .menu a, .arrow { transition: none; } }
+
+/* 3. КАРТОЧКИ проектов: сетка сама перестраивается под ширину экрана */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 18px; transition: transform .2s; backdrop-filter: blur(6px);
+}
+.card:hover { transform: translateY(-4px); }
+.card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.card p { margin: 0; color: var(--muted); font-size: .95rem; }
+.skills { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; }
+.skills li { border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; font-family: system-ui, sans-serif; font-size: .9rem; }
+footer { color: var(--muted); font-family: system-ui, sans-serif; font-size: .85rem; margin-top: 56px; }
+footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<canvas id="space" aria-hidden="true"></canvas>
+<main>
+  <!-- ШАПКА: замени текст на свой -->
+  <p class="tag">Привет, я</p>
+  <h1>bstverx</h1>
+  <p class="lead">Начинающий дизайнер, пробующий себя в разных сферах.</p>
+  <div class="dropdown">
+    <button class="btn" type="button" aria-haspopup="true">Связаться <span class="arrow">▸</span></button>
+    <div class="menu">
+      <a href="https://t.me/tryfvckme" target="_blank" rel="noopener" class="tg" aria-label="Telegram" title="Telegram" style="--i:0"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M21.5 3.5 2.8 10.7c-1.1.4-1.1 1.1-.2 1.4l4.8 1.5 1.8 5.6c.2.6.1.8.7.8.5 0 .7-.2 1-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8L22.9 5c.3-1.3-.5-1.9-1.4-1.5z"/></svg></a>
+      <a href="https://mail.google.com/mail/?view=cm&to=bstverx@gmail.com" target="_blank" rel="noopener" class="gm" aria-label="Gmail" title="Gmail" style="--i:1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5 12 13.5l8.5-6"/></svg></a>
+    </div>
+  </div>
+
+  <h2>Обо мне</h2>
+  <p>Я начинающий дизайнер и пока пробую себя в разных сферах, чтобы понять, что мне ближе всего. Сейчас я осваиваю создание сайтов: учусь, экспериментирую и шаг за шагом набираю опыт работы.</p>
+  <p>Каждая новая работа помогает мне расти и делать следующие проекты увереннее и качественнее. С интересом берусь за новые идеи и задачи, потому что хочу, чтобы мои работы с каждым разом получались всё успешнее.</p>
+
+  <h2>Проекты</h2>
+  <div class="card"><p>Пока ничего нет, но скоро появится.</p></div>
+
+  <h2>Навыки</h2>
+  <ul class="skills">
+    <li>Веб-дизайн</li><li>HTML и CSS</li><li>Адаптивная вёрстка</li><li>Анимации на сайте</li><li>Работа с ИИ-ассистентами</li><li>Постановка задач и промптинг</li>
+  </ul>
+
+  <h2 id="contacts">Контакты</h2>
+  <p>Напиши мне: <a href="mailto:bstverx@gmail.com" style="color:var(--accent)">bstverx@gmail.com</a></p>
+
+  <footer>© 2026 bstverx</footer>
+</main>
+
+<script>
+/* JavaScript: оживляет холст. Каждый кадр мы двигаем точки и рисуем линии между близкими. */
+(function () {
+  var c = document.getElementById('space');
+  var x = c.getContext('2d');
+  var w, h, dpr, P = [];
+  var mouse = null; // положение курсора (null — курсора на экране нет)
+  var REACT = 130; // радиус, в котором точки замечают курсор
+  var LINK = 140; // максимальная длина связи в пикселях
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth; h = window.innerHeight;
+    c.width = w * dpr; c.height = h * dpr;
+    x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Количество точек зависит от размера экрана
+    var n = Math.round(Math.min(220, Math.max(70, w * h / 8000)));
+    while (P.length < n) {
+      P.push({ x: Math.random() * w, y: Math.random() * h,
+               vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5,
+               r: Math.random() * 1.2 + .6 });
+    }
+    P.length = n;
+  }
+
+  function frame(t) {
+    x.clearRect(0, 0, w, h);
+    var i, j, p, q;
+    for (i = 0; i < P.length; i++) {
+      p = P[i];
+      if (!reduce) {
+        // Хаос: каждый кадр чуть-чуть меняем направление случайным образом
+        p.vx += (Math.random() - .5) * .04;
+        p.vy += (Math.random() - .5) * .04;
+        var s = Math.hypot(p.vx, p.vy);
+        if (s > .7) { p.vx *= .7 / s; p.vy *= .7 / s; }
+        p.x += p.vx; p.y += p.vy;
+        // Реакция на курсор: точки рядом с ним мягко отталкиваются
+        if (mouse) {
+          var dx = p.x - mouse.x, dy = p.y - mouse.y, dd = Math.hypot(dx, dy);
+          if (dd < REACT && dd > 0.1) {
+            var f = (1 - dd / REACT) * 1.5; // чем ближе курсор, тем сильнее толчок
+            p.x += dx / dd * f; p.y += dy / dd * f;
+          }
+        }
+        // Вылетела за край — появляется с противоположной стороны
+        if (p.x < -10) p.x = w + 10; if (p.x > w + 10) p.x = -10;
+        if (p.y < -10) p.y = h + 10; if (p.y > h + 10) p.y = -10;
+      }
+    }
+    x.lineWidth = 1;
+    for (i = 0; i < P.length; i++) {
+      for (j = i + 1; j < P.length; j++) {
+        p = P[i]; q = P[j];
+        var d = Math.hypot(p.x - q.x, p.y - q.y);
+        if (d > LINK) continue;
+        // У каждой пары своя «фаза»: связь то появляется, то обрывается
+        var ph = ((i * 92821 + j * 68917) % 1000) / 1000 * 50;
+        var on = Math.sin(t * .0007 + ph);
+        if (on < -.2) continue; // в этот момент связь оборвана
+        var a = (1 - d / LINK) * Math.min(1, (on + .2) * 2) * .6;
+        x.strokeStyle = 'rgba(255,255,255,' + a.toFixed(3) + ')';
+        x.beginPath(); x.moveTo(p.x, p.y); x.lineTo(q.x, q.y); x.stroke();
+      }
+    }
+    // Курсор тоже «связывается» с ближайшими точками
+    if (mouse) {
+      for (i = 0; i < P.length; i++) {
+        p = P[i];
+        var dm = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+        if (dm < REACT) {
+          x.strokeStyle = 'rgba(255,255,255,' + ((1 - dm / REACT) * .8).toFixed(3) + ')';
+          x.beginPath(); x.moveTo(mouse.x, mouse.y); x.lineTo(p.x, p.y); x.stroke();
+        }
+      }
+    }
+    x.fillStyle = '#fff';
+    for (i = 0; i < P.length; i++) {
+      p = P[i];
+      x.beginPath(); x.arc(p.x, p.y, p.r, 0, 6.2832); x.fill();
+    }
+    if (!reduce) requestAnimationFrame(frame);
+  }
+
+  // Следим за курсором (и за пальцем на телефоне)
+  window.addEventListener('pointermove', function (e) { mouse = { x: e.clientX, y: e.clientY }; });
+  window.addEventListener('pointerup', function (e) { if (e.pointerType === 'touch') mouse = null; });
+  document.documentElement.addEventListener('mouseleave', function () { mouse = null; });
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
